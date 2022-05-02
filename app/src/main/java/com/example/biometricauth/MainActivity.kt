@@ -9,7 +9,7 @@ import androidx.compose.material.Button
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -37,20 +37,25 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun Auth() {
+    var auth by remember { mutableStateOf(false) }
+
     Column(
         modifier = Modifier
-            .background(Color.Cyan)
+                //Condicional en el color
+            .background(if (auth) Color.Green else Color.Cyan)
             .fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
         //Conetnidos
-        Text("Necesitas autenticarte", fontSize = 22.sp, fontWeight = FontWeight.Bold)
+        //Condicinal en el text
+        Text(if(auth) "Estás autenticado" else "Necesitas autenticarte", fontSize = 22.sp, fontWeight = FontWeight.Bold)
         Spacer(Modifier.height(8.dp))
         Button(onClick = {
             //Button
         }) {
-            Text("Autenticar")
+            //Condicional en el texto del boton
+            Text(if (auth) "Cerrar" else "Autenticar")
         }
     }
 }
