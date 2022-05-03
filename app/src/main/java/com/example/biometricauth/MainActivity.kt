@@ -4,6 +4,8 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
+import androidx.biometric.BiometricManager
+import androidx.biometric.BiometricPrompt
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Button
@@ -18,6 +20,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.ContextCompat
 import com.example.biometricauth.ui.theme.BiometricAuthTheme
 
 class MainActivity : AppCompatActivity() {
@@ -36,10 +39,39 @@ class MainActivity : AppCompatActivity() {
         //Llamar Setup
         setupAuth()
     }
-    //PRIVATE METHOD
-    private fun setupAuth(){
-        //
+    //PRIVATE METHODS
+    private var canAuthenticate = false
+    private lateinit var promptInfo: BiometricPrompt.PromptInfo //Ya que es una variable en que definiremos en tiempo de ejecución
+    //se le pondrá un lateinit, como los 'late' en Flutter
+
+    private fun setupAuth(){ //BiometricManager debe ser de Androidx..
+        if (BiometricManager.from(this).canAuthenticate(
+                BiometricManager.Authenticators.BIOMETRIC_STRONG
+            or BiometricManager.Authenticators.DEVICE_CREDENTIAL) == BiometricManager.BIOMETRIC_SUCCESS){
+            canAuthenticate = true
+
+            promptInfo = BiometricPrompt.PromptInfo.Builder()
+                .setTitle("Autenticación biométrica")
+                .setSubtitle("Autenticate utilizando el sensor biométrico")
+                .setAllowedAuthenticators(BiometricManager.Authenticators.BIOMETRIC_STRONG
+                        or BiometricManager.Authenticators.DEVICE_CREDENTIAL)
+                .build()
+        }
     }
+    private fun authenticate(auth: (auth:Boolean) -> Unit){
+        if (canAuthenticate){
+            BiometricPrompt(this, ContextCompat.getMainExecutor(this),
+            object : BiometricPrompt.AuthenticationCallback(){
+                override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) {
+                    super.onAuthenticationSucceeded(result)
+                    auth(true)
+                }
+            }).authenticate(promptInfo)
+        } else{
+            auth(true)
+        }
+    }
+
 //COMPOSABLE
     @Composable
     fun Auth() {
@@ -58,7 +90,12 @@ class MainActivity : AppCompatActivity() {
             Text(if(auth) "Estás autenticado" else "Necesitas autenticarte", fontSize = 22.sp, fontWeight = FontWeight.Bold)
             Spacer(Modifier.height(8.dp))
             Button(onClick = {
-                //Button
+                if (auth){
+                    auth = false
+                }
+                authenticate {
+                    auth = it
+                }
             }) {
                 //Condicional en el texto del boton
                 Text(if (auth) "Cerrar" else "Autenticar")
