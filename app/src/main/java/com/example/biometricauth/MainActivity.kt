@@ -3,6 +3,7 @@ package com.example.biometricauth
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Button
@@ -19,7 +20,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.biometricauth.ui.theme.BiometricAuthTheme
 
-class MainActivity : ComponentActivity() {
+class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -27,43 +28,49 @@ class MainActivity : ComponentActivity() {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colors.background
-                ) {
+                ) { //Llamarlo y reflejarlo en el DefaultPreview
                     Auth()
                 }
             }
         }
+        //Llamar Setup
+        setupAuth()
     }
-}
+    //PRIVATE METHOD
+    private fun setupAuth(){
+        //
+    }
+//COMPOSABLE
+    @Composable
+    fun Auth() {
+        var auth by remember { mutableStateOf(false) }
 
-@Composable
-fun Auth() {
-    var auth by remember { mutableStateOf(false) }
-
-    Column(
-        modifier = Modifier
+        Column(
+            modifier = Modifier
                 //Condicional en el color
-            .background(if (auth) Color.Green else Color.Cyan)
-            .fillMaxSize(),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ) {
-        //Conetnidos
-        //Condicinal en el text
-        Text(if(auth) "Estás autenticado" else "Necesitas autenticarte", fontSize = 22.sp, fontWeight = FontWeight.Bold)
-        Spacer(Modifier.height(8.dp))
-        Button(onClick = {
-            //Button
-        }) {
-            //Condicional en el texto del boton
-            Text(if (auth) "Cerrar" else "Autenticar")
+                .background(if (auth) Color.Green else Color.Cyan)
+                .fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            //Conetnidos
+            //Condicinal en el text
+            Text(if(auth) "Estás autenticado" else "Necesitas autenticarte", fontSize = 22.sp, fontWeight = FontWeight.Bold)
+            Spacer(Modifier.height(8.dp))
+            Button(onClick = {
+                //Button
+            }) {
+                //Condicional en el texto del boton
+                Text(if (auth) "Cerrar" else "Autenticar")
+            }
         }
     }
-}
 
-@Preview(showSystemUi = true) //completa vista
-@Composable
-fun DefaultPreview() {
-    BiometricAuthTheme {
-        Auth()
+    @Preview(showSystemUi = true) //completa vista
+    @Composable
+    fun DefaultPreview() {
+        BiometricAuthTheme {
+            Auth()
+        }
     }
 }
